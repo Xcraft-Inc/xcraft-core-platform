@@ -1,0 +1,22 @@
+{
+  "name": "xcraft-core-platform",
+  "version": "0.1.0",
+  "description": "Xcraft cross-platform helpers",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "xcraft",
+    "helpers",
+    "platform"
+  ],
+  "repository" : {
+    "type" : "file",
+    "url" : "lib/xcraft-core-platform"
+  },
+  "author": "Mathieu Schroeter",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {}
+}
