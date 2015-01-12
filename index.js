@@ -20,10 +20,6 @@ exports.getToolchainArch = function () {
   var os = /^win/.test (process.platform) ? 'mswindows' : process.platform;
   var arch = process.arch;
   switch (process.arch) {
-    case 'ia32': {
-      arch = '-' + 'i386';
-      break;
-    }
     case 'x64':  {
       arch = '-' + 'amd64';
       break;
