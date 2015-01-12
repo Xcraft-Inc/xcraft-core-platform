@@ -15,3 +15,19 @@ exports.getShellExt = function () {
 exports.getCmdExt = function () {
   return /^win/.test (process.platform) ? '.cmd' : '';
 };
+
+exports.getToolchainArch = function () {
+  var os = /^win/.test (process.platform) ? 'mswindows' : process.platform;
+  var arch = process.arch;
+  switch (process.arch) {
+    case 'ia32': {
+      arch = '-' + 'i386';
+      break;
+    }
+    case 'x64':  {
+      arch = '-' + 'amd64';
+      break;
+    }
+  }
+  return os + arch;
+};
