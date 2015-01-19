@@ -21,7 +21,7 @@ exports.getToolchainArch = function () {
   var arch = process.arch;
 
   switch (process.arch) {
-  case 'x64':  {
+  case 'x64': {
     arch = '-' + 'amd64';
     break;
   }
