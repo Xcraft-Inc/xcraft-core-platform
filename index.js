@@ -29,3 +29,5 @@ exports.getToolchainArch = function () {
 
   return os + arch;
 };
+
+exports.Subst = require ('./lib/subst.js');

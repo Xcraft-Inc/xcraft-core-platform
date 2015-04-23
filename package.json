@@ -17,6 +17,8 @@
   },
   "author": "Mathieu Schroeter",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "xcraft-core-process": "0.1.0"
+  },
   "devDependencies": {}
 }
