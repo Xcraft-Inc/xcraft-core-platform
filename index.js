@@ -12,6 +12,13 @@ exports.getShellExt = function () {
   return /^win/.test (process.platform) ? '.bat' : '';
 };
 
+exports.getShellExtArray = function () {
+  return [
+    '.bat',
+    ''
+  ];
+};
+
 exports.getCmdExt = function () {
   return /^win/.test (process.platform) ? '.cmd' : '';
 };
