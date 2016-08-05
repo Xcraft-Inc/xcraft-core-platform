@@ -1,6 +1,6 @@
 {
   "name": "xcraft-core-platform",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Xcraft cross-platform helpers",
   "main": "index.js",
   "engines": {
