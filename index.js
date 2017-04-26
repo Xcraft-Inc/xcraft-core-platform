@@ -13,10 +13,7 @@ exports.getShellExt = function () {
 };
 
 exports.getShellExtArray = function () {
-  return [
-    '.bat',
-    ''
-  ];
+  return ['.bat', ''];
 };
 
 exports.getCmdExt = function () {
@@ -28,10 +25,10 @@ exports.getToolchainArch = function () {
   var arch = process.arch;
 
   switch (process.arch) {
-  case 'x64': {
-    arch = '-' + 'amd64';
-    break;
-  }
+    case 'x64': {
+      arch = '-' + 'amd64';
+      break;
+    }
   }
 
   return os + arch;
