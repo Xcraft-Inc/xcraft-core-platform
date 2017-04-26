@@ -14,14 +14,17 @@
     "helpers",
     "platform"
   ],
-  "repository" : {
-    "type" : "git",
-    "url" : "git+https://github.com/Xcraft-Inc/xcraft-core-platform.git"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Xcraft-Inc/xcraft-core-platform.git"
   },
   "author": "Mathieu Schroeter",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Xcraft-Inc/xcraft-core-platform/issues"
   },
-  "homepage": "https://github.com/Xcraft-Inc/xcraft-core-platform#readme"
+  "homepage": "https://github.com/Xcraft-Inc/xcraft-core-platform#readme",
+  "devDependencies": {
+    "xcraft-dev-rules": "^0.1.6"
+  }
 }
