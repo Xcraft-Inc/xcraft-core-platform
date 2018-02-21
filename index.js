@@ -1,27 +1,27 @@
 'use strict';
 
-exports.getOs = function () {
-  return /^win/.test (process.platform) ? 'win' : process.platform;
+exports.getOs = function() {
+  return /^win/.test(process.platform) ? 'win' : process.platform;
 };
 
-exports.getExecExt = function () {
-  return /^win/.test (process.platform) ? '.exe' : '';
+exports.getExecExt = function() {
+  return /^win/.test(process.platform) ? '.exe' : '';
 };
 
-exports.getShellExt = function () {
-  return /^win/.test (process.platform) ? '.bat' : '';
+exports.getShellExt = function() {
+  return /^win/.test(process.platform) ? '.bat' : '';
 };
 
-exports.getShellExtArray = function () {
+exports.getShellExtArray = function() {
   return ['.bat', ''];
 };
 
-exports.getCmdExt = function () {
-  return /^win/.test (process.platform) ? '.cmd' : '';
+exports.getCmdExt = function() {
+  return /^win/.test(process.platform) ? '.cmd' : '';
 };
 
-exports.getToolchainArch = function () {
-  var os = /^win/.test (process.platform) ? 'mswindows' : process.platform;
+exports.getToolchainArch = function() {
+  var os = /^win/.test(process.platform) ? 'mswindows' : process.platform;
   var arch = process.arch;
 
   switch (process.arch) {
