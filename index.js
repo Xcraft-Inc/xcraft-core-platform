@@ -1,26 +1,26 @@
 'use strict';
 
-exports.getOs = function() {
+exports.getOs = function () {
   return /^win/.test(process.platform) ? 'win' : process.platform;
 };
 
-exports.getExecExt = function() {
+exports.getExecExt = function () {
   return /^win/.test(process.platform) ? '.exe' : '';
 };
 
-exports.getShellExt = function() {
+exports.getShellExt = function () {
   return /^win/.test(process.platform) ? '.bat' : '';
 };
 
-exports.getShellExtArray = function() {
+exports.getShellExtArray = function () {
   return ['.bat', ''];
 };
 
-exports.getCmdExt = function() {
+exports.getCmdExt = function () {
   return /^win/.test(process.platform) ? '.cmd' : '';
 };
 
-exports.getToolchainArch = function() {
+exports.getToolchainArch = function () {
   var os = /^win/.test(process.platform) ? 'mswindows' : process.platform;
   var arch = process.arch;
 
