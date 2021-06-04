@@ -29,6 +29,10 @@ exports.getToolchainArch = function () {
       arch = 'amd64';
       break;
     }
+    case 'arm64': {
+      arch = 'aarch64';
+      break;
+    }
   }
 
   return `${os}-${arch}`;
