@@ -26,10 +26,10 @@ exports.getToolchainArch = function () {
 
   switch (process.arch) {
     case 'x64': {
-      arch = '-' + 'amd64';
+      arch = 'amd64';
       break;
     }
   }
 
-  return os + arch;
+  return `${os}-${arch}`;
 };
