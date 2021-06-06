@@ -37,3 +37,14 @@ exports.getToolchainArch = function () {
 
   return `${os}-${arch}`;
 };
+
+exports.getArchVariant = function (arch) {
+  switch (arch) {
+    case 'x32':
+      return 'x86_32';
+    case 'x64':
+      return 'x86_64';
+    default:
+      return arch;
+  }
+};
