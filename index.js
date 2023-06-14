@@ -20,9 +20,8 @@ exports.getCmdExt = function () {
   return /^win/.test(process.platform) ? '.cmd' : '';
 };
 
-exports.getToolchainArch = function () {
-  var os = /^win/.test(process.platform) ? 'mswindows' : process.platform;
-  var arch = process.arch;
+exports.getArch = function () {
+  let arch = process.arch;
 
   switch (process.arch) {
     case 'x64': {
@@ -35,6 +34,12 @@ exports.getToolchainArch = function () {
     }
   }
 
+  return arch;
+};
+
+exports.getToolchainArch = function () {
+  const os = /^win/.test(process.platform) ? 'mswindows' : process.platform;
+  const arch = exports.getArch();
   return `${os}-${arch}`;
 };
 
