@@ -1,8 +1,8 @@
-# 📘 Documentation du module xcraft-core-platform
+# 📘 xcraft-core-platform
 
 ## Aperçu
 
-Le module `xcraft-core-platform` est une librairie utilitaire du framework Xcraft qui fournit des fonctions d'aide pour la gestion multi-plateforme. Il permet de détecter et d'adapter le comportement de l'application selon le système d'exploitation et l'architecture matérielle, en normalisant les différences entre Windows, Linux, macOS et autres plateformes Unix.
+Le module `xcraft-core-platform` est une librairie utilitaire de base du framework Xcraft. Elle fournit un ensemble de fonctions d'aide permettant de détecter et de normaliser les informations relatives à la plateforme d'exécution : système d'exploitation, extensions de fichiers exécutables/scripts, et architecture matérielle du processeur. Son objectif principal est de masquer les différences entre Windows, Linux, macOS et les autres systèmes Unix-like, afin que les autres modules Xcraft puissent construire des chemins, sélectionner des binaires ou des toolchains de manière cohérente, quelle que soit la plateforme cible.
 
 ## Sommaire
 
@@ -11,21 +11,34 @@ Le module `xcraft-core-platform` est une librairie utilitaire du framework Xcraf
 - [Exemples d'utilisation](#exemples-dutilisation)
 - [Interactions avec d'autres modules](#interactions-avec-dautres-modules)
 - [Détails des sources](#détails-des-sources)
+- [Licence](#licence)
 
 ## Structure du module
 
-Le module est composé d'un seul fichier principal `index.js` qui expose huit fonctions utilitaires :
+Le module est extrêmement compact et se compose d'un unique fichier source, `index.js`, qui expose huit fonctions utilitaires sans état, purement dérivées des propriétés natives de Node.js (`process.platform` et `process.arch`) :
 
-- **Détection de plateforme** : `getOs()`
-- **Extensions d'exécutables** : `getExecExt()`, `getShellExt()`, `getCmdExt()`
-- **Gestion des architectures** : `getArch()`, `getArchVariant()`, `getToolchainArch()`
-- **Utilitaires spécialisés** : `getShellExtArray()`
+- **Détection du système d'exploitation** : `getOs()`
+- **Extensions de fichiers dépendantes de la plateforme** : `getExecExt()`, `getShellExt()`, `getShellExtArray()`, `getCmdExt()`
+- **Gestion et normalisation des architectures matérielles** : `getArch()`, `getArchVariant(arch)`, `getToolchainArch()`
+
+Il n'y a ni acteur (Elf/Goblin), ni widget React, ni fichier de configuration (`config.js`) dans ce module : il s'agit d'une pure librairie utilitaire, sans dépendance externe déclarée dans son `package.json`.
 
 ## Fonctionnement global
 
-Le module utilise les propriétés natives de Node.js (`process.platform` et `process.arch`) pour détecter l'environnement d'exécution et fournir des informations normalisées. Il se base principalement sur la détection de Windows via l'expression régulière `/^win/` pour différencier les comportements entre Windows et les systèmes Unix-like.
+Toutes les fonctions du module reposent sur deux propriétés natives fournies par Node.js :
 
-Les fonctions normalisent les noms d'architectures selon les conventions utilisées dans différents contextes (par exemple, `x64` devient `amd64` pour certains outils, ou `x86_64` pour d'autres).
+- `process.platform`, pour identifier le système d'exploitation ;
+- `process.arch`, pour identifier l'architecture du processeur.
+
+La détection de Windows se fait systématiquement via l'expression régulière `/^win/`, ce qui permet de couvrir les différentes valeurs possibles retournées par Node.js sur les systèmes Windows (`win32` notamment). Sur toute autre plateforme, la valeur brute de `process.platform` est renvoyée telle quelle (par exemple `linux` ou `darwin`).
+
+Pour les architectures, le module effectue une traduction des noms internes de Node.js vers des conventions plus répandues dans l'écosystème des outils de build et de packaging :
+
+- `x64` → `amd64` (via `getArch()`)
+- `arm64` → `aarch64` (via `getArch()`)
+- `x32` → `x86_32` et `x64` → `x86_64` (via `getArchVariant()`, qui utilise une convention différente, orientée toolchains de compilation)
+
+La fonction `getToolchainArch()` combine la détection d'OS et d'architecture pour produire un identifiant unique de toolchain, au format `os-arch` (par exemple `linux-amd64` ou `mswindows-aarch64`), en utilisant `mswindows` plutôt que `win` afin de rester cohérent avec les conventions de nommage des toolchains de compilation croisée.
 
 ## Exemples d'utilisation
 
@@ -34,66 +47,55 @@ const xPlatform = require('xcraft-core-platform');
 
 // Détection du système d'exploitation
 const os = xPlatform.getOs();
-console.log(`Système détecté: ${os}`); // 'win', 'linux', 'darwin', etc.
+console.log(`Système détecté : ${os}`); // 'win', 'linux', 'darwin', etc.
 
-// Construction de chemins d'exécutables
+// Construction du nom d'un exécutable selon la plateforme
 const executableName = `myapp${xPlatform.getExecExt()}`;
-// Windows: 'myapp.exe', Unix: 'myapp'
+// Windows : 'myapp.exe' — Unix : 'myapp'
 
-// Scripts de démarrage selon la plateforme
-const scriptName = `startup${xPlatform.getShellExt()}`;
-// Windows: 'startup.bat', Unix: 'startup'
+// Recherche d'un script en tenant compte des extensions possibles
+for (const ext of xPlatform.getShellExtArray()) {
+  const candidate = `startup${ext}`;
+  // tester l'existence de 'startup.bat' puis 'startup'
+}
 
-// Détection d'architecture normalisée
-const arch = xPlatform.getArch();
-console.log(`Architecture: ${arch}`); // 'amd64', 'aarch64', etc.
-
-// Identification de toolchain complète
+// Identification de la toolchain complète pour le téléchargement d'un binaire
 const toolchain = xPlatform.getToolchainArch();
-console.log(`Toolchain: ${toolchain}`); // 'linux-amd64', 'mswindows-amd64', etc.
+console.log(`Toolchain : ${toolchain}`); // ex: 'linux-amd64'
 
-// Recherche de scripts avec extensions multiples
-const extensions = xPlatform.getShellExtArray();
-// ['.bat', ''] - permet de chercher 'script.bat' puis 'script'
-
-// Conversion d'architecture pour des outils spécifiques
+// Conversion d'une architecture vers son variant spécifique
 const variant = xPlatform.getArchVariant('x64');
-console.log(`Variant: ${variant}`); // 'x86_64'
+console.log(`Variant : ${variant}`); // 'x86_64'
 ```
 
 ## Interactions avec d'autres modules
 
-Ce module est une dépendance fondamentale utilisée par de nombreux autres modules Xcraft pour :
+`xcraft-core-platform` est une dépendance transverse de bas niveau, utilisée par de nombreux modules de l'écosystème Xcraft dès qu'un comportement doit être adapté à la plateforme d'exécution, notamment pour :
 
-- **Modules de build** : Sélection des outils de compilation appropriés selon l'architecture
-- **Gestionnaires de paquets** : Téléchargement des binaires compatibles avec la plateforme
-- **Modules d'exécution** : Construction de chemins d'exécutables et de scripts
-- **Outils de déploiement** : Identification des environnements cibles
+- les modules de build et de compilation, pour sélectionner la toolchain ou les outils natifs adaptés à l'architecture ;
+- les gestionnaires de paquets et de binaires, pour télécharger la version compatible avec l'OS et l'architecture courants ;
+- les modules d'exécution de processus, pour construire des chemins vers des exécutables ou des scripts shell portables ;
+- les outils de déploiement, pour identifier précisément l'environnement cible.
 
 ## Détails des sources
 
 ### `index.js`
 
-Le fichier principal expose toutes les fonctions utilitaires du module pour la détection et la normalisation des informations de plateforme.
+Ce fichier unique expose l'ensemble des fonctions utilitaires du module. Toutes les fonctions sont synchrones, sans effet de bord, et ne font que lire les propriétés natives de Node.js pour en dériver une valeur normalisée.
 
 #### Méthodes publiques
 
-- **`getOs()`** — Retourne le nom normalisé du système d'exploitation. Convertit tous les variants Windows (win32, win64, etc.) en 'win', et conserve les noms natifs pour les autres plateformes (linux, darwin, etc.).
+- **`getOs()`** — Retourne le nom normalisé du système d'exploitation courant. Renvoie `'win'` si `process.platform` correspond à l'expression `/^win/`, sinon renvoie la valeur brute de `process.platform` (par exemple `'linux'` ou `'darwin'`).
+- **`getExecExt()`** — Retourne l'extension de fichier à utiliser pour un exécutable : `'.exe'` sur Windows, chaîne vide sur les autres plateformes.
+- **`getShellExt()`** — Retourne l'extension à utiliser pour un script shell : `'.bat'` sur Windows, chaîne vide sur les autres plateformes.
+- **`getShellExtArray()`** — Retourne le tableau `['.bat', '']`, représentant l'ensemble des extensions de script à essayer lors d'une recherche de fichier, indépendamment de la plateforme courante.
+- **`getCmdExt()`** — Retourne l'extension à utiliser pour un fichier de commande Windows : `'.cmd'` sur Windows, chaîne vide ailleurs.
+- **`getArch()`** — Retourne l'architecture matérielle normalisée du processeur, en traduisant `'x64'` en `'amd64'` et `'arm64'` en `'aarch64'` ; les autres valeurs de `process.arch` sont renvoyées inchangées.
+- **`getToolchainArch()`** — Retourne une chaîne au format `os-arch` identifiant la toolchain de compilation correspondant à la plateforme courante. Utilise `'mswindows'` (plutôt que `'win'`) pour Windows, et s'appuie sur `getArch()` pour la partie architecture.
+- **`getArchVariant(arch)`** — Convertit un nom d'architecture donné en paramètre vers un variant utilisé par certains outils : `'x32'` devient `'x86_32'`, `'x64'` devient `'x86_64'` ; toute autre valeur est retournée telle quelle.
 
-- **`getExecExt()`** — Retourne l'extension appropriée pour les fichiers exécutables. Retourne '.exe' sur Windows, chaîne vide sur les autres plateformes.
+## Licence
 
-- **`getShellExt()`** — Retourne l'extension pour les scripts shell. Retourne '.bat' sur Windows, chaîne vide sur Unix.
+Ce module est distribué sous [licence MIT](./LICENSE).
 
-- **`getShellExtArray()`** — Retourne un tableau contenant toutes les extensions de script possibles ['.bat', ''], utile pour la recherche de scripts dans différents formats.
-
-- **`getCmdExt()`** — Retourne l'extension pour les fichiers de commande Windows. Retourne '.cmd' sur Windows, chaîne vide ailleurs.
-
-- **`getArch()`** — Retourne l'architecture normalisée du processeur. Convertit 'x64' en 'amd64' et 'arm64' en 'aarch64' pour une compatibilité étendue avec les outils de build.
-
-- **`getToolchainArch()`** — Retourne une chaîne identifiant la combinaison OS-architecture au format 'os-arch'. Utilise 'mswindows' au lieu de 'win' pour Windows, facilitant l'identification des toolchains de compilation.
-
-- **`getArchVariant(arch)`** — Convertit les noms d'architecture vers des variants spécifiques. Transforme 'x32' en 'x86_32' et 'x64' en 'x86_64', conserve les autres architectures inchangées.
-
----
-
-_Ce document a été mis à jour pour refléter l'état actuel du module._
+_Ce contenu a été généré par IA_
