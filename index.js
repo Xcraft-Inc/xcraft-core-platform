@@ -49,6 +49,8 @@ exports.getArchVariant = function (arch) {
       return 'x86_32';
     case 'x64':
       return 'x86_64';
+    case 'arm64':
+      return 'aarch64';
     default:
       return arch;
   }
